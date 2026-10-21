@@ -1,0 +1,191 @@
+{
+  "info": {
+    "_postman_id": "f8bb9ab5-7ee1-4acb-8b33-c504a397e19b",
+    "name": "CampusDesk Student Management API",
+    "description": "Main auth, student, course, and enrollment requests routed through the API gateway. Run Register, then Login; the login test stores access_token automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "gateway", "value": "http://127.0.0.1:8000" },
+    { "key": "access_token", "value": "" },
+    { "key": "student_id", "value": "1" },
+    { "key": "course_id", "value": "1" },
+    { "key": "email", "value": "learner@example.com" },
+    { "key": "password", "value": "ChangeMe123!" },
+    { "key": "name", "value": "Anil" }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"{{name}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": "{{gateway}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "if (pm.response.code === 200) {",
+                "  pm.collectionVariables.set('access_token', pm.response.json().access_token);",
+                "}"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": "{{gateway}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Current user",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{gateway}}/api/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "Create student",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Jordan Lee\",\n  \"email\": \"jordan.lee@example.com\",\n  \"phone\": \"+1 555 010 2040\",\n  \"department\": \"Computer Science\",\n  \"course\": \"Web Development\"\n}" },
+            "url": "{{gateway}}/api/students"
+          }
+        },
+        {
+          "name": "List students",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{gateway}}/api/students"
+          }
+        },
+        {
+          "name": "Get student",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{gateway}}/api/students/{{student_id}}"
+          }
+        },
+        {
+          "name": "Update student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Jordan Lee\",\n  \"email\": \"jordan.lee@example.com\",\n  \"phone\": \"+1 555 010 2040\",\n  \"department\": \"Computing\",\n  \"course\": \"Web Development\"\n}" },
+            "url": "{{gateway}}/api/students/{{student_id}}"
+          }
+        },
+        {
+          "name": "Delete student",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{gateway}}/api/students/{{student_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Courses and enrollment",
+      "item": [
+        {
+          "name": "Create course",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Web Development\",\n  \"code\": \"WEB-101\",\n  \"description\": \"Modern web application fundamentals.\"\n}" },
+            "url": "{{gateway}}/api/courses"
+          }
+        },
+        {
+          "name": "List courses",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{gateway}}/api/courses"
+          }
+        },
+        {
+          "name": "Get course",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{gateway}}/api/courses/{{course_id}}"
+          }
+        },
+        {
+          "name": "Update course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Web Development II\",\n  \"code\": \"WEB-101\",\n  \"description\": \"Updated course description.\"\n}" },
+            "url": "{{gateway}}/api/courses/{{course_id}}"
+          }
+        },
+        {
+          "name": "Enroll student",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{gateway}}/api/courses/{{course_id}}/students/{{student_id}}"
+          }
+        },
+        {
+          "name": "List enrolled students",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{gateway}}/api/courses/{{course_id}}/students"
+          }
+        },
+        {
+          "name": "Remove enrollment",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{gateway}}/api/courses/{{course_id}}/students/{{student_id}}"
+          }
+        },
+        {
+          "name": "Delete course",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{gateway}}/api/courses/{{course_id}}"
+          }
+        }
+      ]
+    }
+  ]
+}
